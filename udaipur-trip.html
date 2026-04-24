@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Udaipur · Two Evenings · A Trip for You & Samvir</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root {
+    --ink: #0E1729;
+    --ink-soft: #2A3347;
+    --parchment: #F5EBD6;
+    --parchment-deep: #EADFC5;
+    --parchment-dark: #DBCFB1;
+    --marigold: #E09C2E;
+    --marigold-deep: #B8771A;
+    --terracotta: #C4553A;
+    --terracotta-deep: #8B3A25;
+    --lake: #1E4A6B;
+    --lake-deep: #0B2B47;
+    --sunset: #ED9A74;
+    --sunset-deep: #D87144;
+    --peacock: #1D6F67;
+    --rose: #B8455D;
+    --cream: #FCF7EA;
+  }
+
+  html, body {
+    background: var(--parchment);
+    color: var(--ink);
+    font-family: 'Manrope', sans-serif;
+    font-feature-settings: 'ss01', 'ss02';
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  /* Paper noise texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.35;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.1 0 0 0 0 0.1 0 0 0 0.22 0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
+  }
+
+  .font-display { font-family: 'Fraunces', serif; font-optical-sizing: auto; }
+  .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+  .paper {
+    background: var(--parchment);
+    box-shadow:
+      inset 0 0 80px rgba(139, 58, 37, 0.08),
+      0 2px 0 rgba(0,0,0,0.03);
+  }
+
+  .card-deep {
+    background: var(--parchment-deep);
+    border: 1px solid var(--parchment-dark);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.4) inset, 0 4px 20px -8px rgba(139,58,37,0.2);
+  }
+
+  .ink-border { border-color: var(--ink); }
+  .ink-text { color: var(--ink); }
+  .soft-ink { color: var(--ink-soft); }
+
+  /* Decorative rule: a double line with center diamond */
+  .fancy-rule {
+    position: relative;
+    height: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 2rem 0;
+  }
+  .fancy-rule::before, .fancy-rule::after {
+    content: '';
+    flex: 1;
+    border-top: 1px solid var(--ink);
+    opacity: 0.35;
+  }
+  .fancy-rule span {
+    padding: 0 1rem;
+    font-family: 'Fraunces', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--terracotta-deep);
+  }
+
+  /* Ticket stub / perforated edge */
+  .ticket {
+    position: relative;
+    background: var(--cream);
+    border: 1.5px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .ticket::before, .ticket::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px; height: 16px;
+    background: var(--parchment);
+    border: 1.5px solid var(--ink);
+    border-radius: 50%;
+  }
+  .ticket::before { left: -10px; }
+  .ticket::after { right: -10px; }
+
+  /* Stop card */
+  .stop-card {
+    background: var(--cream);
+    border: 1px solid var(--ink);
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .stop-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 6px;
+    background: var(--stop-color, var(--marigold));
+    transition: width 0.35s ease;
+  }
+  .stop-card:hover {
+    transform: translateX(4px);
+    box-shadow: 6px 6px 0 var(--ink);
+  }
+  .stop-card:hover::before { width: 10px; }
+  .stop-card.open {
+    transform: translateX(4px);
+    box-shadow: 8px 8px 0 var(--ink);
+  }
+  .stop-card.open::before { width: 10px; }
+  .stop-card.done {
+    opacity: 0.55;
+  }
+  .stop-card.done .stop-title::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    top: 50%;
+    border-top: 2px solid var(--ink);
+    opacity: 0.7;
+  }
+
+  .stop-detail {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .stop-card.open .stop-detail {
+    max-height: 2000px;
+  }
+
+  /* Stamp effect */
+  .stamp {
+    display: inline-block;
+    border: 2px solid var(--terracotta);
+    color: var(--terracotta);
+    padding: 4px 10px;
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    transform: rotate(-3deg);
+    opacity: 0.85;
+    background: rgba(196, 85, 58, 0.06);
+  }
+
+  /* Pulsing dot */
+  @keyframes pulse-dot {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.6; }
+  }
+  .pulse-dot {
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+
+  /* Day toggle */
+  .day-toggle {
+    position: relative;
+    background: var(--parchment-deep);
+    border: 1.5px solid var(--ink);
+    border-radius: 999px;
+    padding: 4px;
+    display: inline-flex;
+  }
+  .day-toggle button {
+    position: relative;
+    z-index: 2;
+    padding: 10px 28px;
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--ink);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+  .day-toggle button.active { color: var(--cream); }
+  .day-toggle .pill {
+    position: absolute;
+    z-index: 1;
+    top: 4px; bottom: 4px;
+    width: calc(50% - 4px);
+    background: var(--ink);
+    border-radius: 999px;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .day-toggle.day-2 .pill { transform: translateX(100%); }
+
+  /* Checkbox custom */
+  .custom-check {
+    width: 22px; height: 22px;
+    border: 1.5px solid var(--ink);
+    background: var(--cream);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+  }
+  .custom-check.checked {
+    background: var(--marigold);
+  }
+  .custom-check svg {
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.2s ease;
+  }
+  .custom-check.checked svg {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* Fade-in animation */
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-fade {
+    animation: fadeSlide 0.4s ease forwards;
+  }
+  .stagger > * { opacity: 0; animation: fadeSlide 0.5s ease forwards; }
+  .stagger > *:nth-child(1) { animation-delay: 0.05s; }
+  .stagger > *:nth-child(2) { animation-delay: 0.1s; }
+  .stagger > *:nth-child(3) { animation-delay: 0.15s; }
+  .stagger > *:nth-child(4) { animation-delay: 0.2s; }
+  .stagger > *:nth-child(5) { animation-delay: 0.25s; }
+  .stagger > *:nth-child(6) { animation-delay: 0.3s; }
+
+  /* Progress bar */
+  .progress-track {
+    height: 8px;
+    background: var(--parchment-dark);
+    border: 1px solid var(--ink);
+    position: relative;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: repeating-linear-gradient(
+      -45deg,
+      var(--marigold),
+      var(--marigold) 8px,
+      var(--marigold-deep) 8px,
+      var(--marigold-deep) 16px
+    );
+    transition: width 0.5s ease;
+  }
+
+  /* Sun / moon icons */
+  .sun-rays {
+    animation: rotate 24s linear infinite;
+  }
+  @keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* Hover phone card */
+  .phone-card {
+    background: var(--cream);
+    border: 1.5px solid var(--ink);
+    transition: all 0.25s ease;
+    cursor: pointer;
+  }
+  .phone-card:hover {
+    background: var(--ink);
+    color: var(--cream);
+    transform: translateY(-2px);
+  }
+  .phone-card:hover .phone-label { color: var(--marigold); }
+
+  /* Tag chip */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    background: var(--parchment-deep);
+    border: 1px solid var(--ink);
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-weight: 600;
+    border-radius: 999px;
+  }
+  .chip.gold { background: var(--marigold); color: var(--ink); border-color: var(--marigold-deep); }
+  .chip.terra { background: var(--terracotta); color: var(--cream); border-color: var(--terracotta-deep); }
+  .chip.peacock { background: var(--peacock); color: var(--cream); border-color: var(--peacock); }
+
+  /* Marigold decorative flower */
+  .marigold-svg {
+    width: 40px; height: 40px;
+    opacity: 0.85;
+  }
+
+  /* YJHD quote */
+  .yjhd-quote {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--terracotta-deep);
+    padding-left: 20px;
+    border-left: 3px solid var(--marigold);
+    position: relative;
+  }
+  .yjhd-quote::before {
+    content: '❋';
+    position: absolute;
+    left: -10px; top: -2px;
+    background: var(--cream);
+    color: var(--marigold);
+    padding: 0 4px;
+    font-size: 0.8rem;
+  }
+
+  /* Packing list item */
+  .pack-item {
+    padding: 6px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px dashed var(--parchment-dark);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .pack-item.packed {
+    opacity: 0.5;
+  }
+  .pack-item.packed .pack-label {
+    text-decoration: line-through;
+  }
+
+  /* Mini map */
+  .map-pin {
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .map-pin:hover {
+    transform: scale(1.2);
+    transform-origin: center bottom;
+  }
+  .map-pin.active circle {
+    fill: var(--terracotta);
+  }
+  .map-pin text {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 11px;
+    fill: var(--ink);
+  }
+
+  /* Budget counter */
+  .budget-num {
+    font-variant-numeric: tabular-nums;
+    transition: color 0.3s ease;
+  }
+
+  /* Scroll indicator */
+  .scroll-indicator {
+    display: inline-block;
+    animation: bounce 1.8s ease-in-out infinite;
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(6px); }
+  }
+
+  /* Day theme switch */
+  body.day-2-theme {
+    --stop-color-base: var(--peacock);
+  }
+
+  .bg-theme-gradient-1 {
+    background: linear-gradient(135deg, var(--sunset) 0%, var(--marigold) 50%, var(--terracotta) 100%);
+  }
+  .bg-theme-gradient-2 {
+    background: linear-gradient(135deg, var(--lake) 0%, var(--peacock) 50%, var(--ink) 100%);
+  }
+
+  .hand-arrow {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    position: relative;
+  }
+
+  /* Details grid */
+  .detail-grid {
+    display: grid;
+    gap: 16px;
+  }
+  @media (min-width: 640px) {
+    .detail-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* Info pill */
+  .info-pill {
+    padding: 12px 16px;
+    background: var(--parchment);
+    border: 1px solid var(--ink);
+    border-left: 4px solid var(--marigold);
+  }
+  .info-pill.warn { border-left-color: var(--terracotta); }
+  .info-pill.good { border-left-color: var(--peacock); }
+
+  /* Responsive tweaks */
+  @media (max-width: 640px) {
+    .hero-title { font-size: 2.8rem !important; line-height: 1 !important; }
+    .hero-kicker { font-size: 0.7rem !important; }
+  }
+
+  /* Hide scrollbar on main but keep ability to scroll */
+  ::-webkit-scrollbar { width: 10px; }
+  ::-webkit-scrollbar-track { background: var(--parchment); }
+  ::-webkit-scrollbar-thumb { background: var(--ink-soft); border: 2px solid var(--parchment); }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- ================== HERO ================== -->
+<header class="paper relative overflow-hidden">
+  <!-- Decorative sun in corner -->
+  <svg class="absolute -top-20 -right-20 opacity-10" width="300" height="300" viewBox="0 0 100 100">
+    <g class="sun-rays" style="transform-origin: 50px 50px;">
+      <circle cx="50" cy="50" r="18" fill="none" stroke="currentColor" stroke-width="1.5" style="color: var(--terracotta)"/>
+      <g style="color: var(--terracotta)">
+        <line x1="50" y1="5" x2="50" y2="20" stroke="currentColor" stroke-width="1.2"/>
+        <line x1="50" y1="80" x2="50" y2="95" stroke="currentColor" stroke-width="1.2"/>
+        <line x1="5" y1="50" x2="20" y2="50" stroke="currentColor" stroke-width="1.2"/>
+        <line x1="80" y1="50" x2="95" y2="50" stroke="currentColor" stroke-width="1.2"/>
+        <line x1="18" y1="18" x2="28" y2="28" stroke="currentColor" stroke-width="1.2"/>
+        <line x1="72" y1="72" x2="82" y2="82" stroke="currentColor" stroke-width="1.2"/>
+        <line x1="82" y1="18" x2="72" y2="28" stroke="currentColor" stroke-width="1.2"/>
+        <line x1="28" y1="72" x2="18" y2="82" stroke="currentColor" stroke-width="1.2"/>
+      </g>
+    </g>
+  </svg>
+
+  <div class="max-w-5xl mx-auto px-6 sm:px-10 pt-10 pb-12 relative">
+    <!-- Top strip -->
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-8">
+      <div class="flex items-center gap-2 text-xs font-mono tracking-widest uppercase" style="color: var(--terracotta-deep)">
+        <span class="w-2 h-2 rounded-full pulse-dot" style="background: var(--terracotta)"></span>
+        Trip Dossier · Apr 26–27
+      </div>
+      <div class="font-mono text-xs tracking-widest uppercase" style="color: var(--ink-soft)">
+        Vol. I · For You & Samvir
+      </div>
+    </div>
+
+    <!-- Kicker line -->
+    <div class="hero-kicker font-mono text-xs tracking-[0.35em] uppercase mb-4" style="color: var(--terracotta-deep)">
+      ❋ City of Lakes · Mewar Heritage · A Two-Evening Odyssey ❋
+    </div>
+
+    <!-- Main title -->
+    <h1 class="font-display hero-title" style="font-size: clamp(3rem, 9vw, 6.5rem); line-height: 0.92; font-weight: 300; letter-spacing: -0.02em;">
+      <span style="font-style: italic; font-weight: 400;">Udaipur</span><span style="color: var(--terracotta)">.</span><br>
+      <span style="font-weight: 600; letter-spacing: -0.03em;">Two evenings,</span><br>
+      <span style="font-weight: 300; font-style: italic; color: var(--terracotta-deep);">one postcard.</span>
+    </h1>
+
+    <!-- Subtitle / meta bar -->
+    <div class="mt-10 grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t-2" style="border-color: var(--ink)">
+      <div>
+        <div class="font-mono text-[10px] tracking-widest uppercase opacity-60">Base</div>
+        <div class="font-display text-lg mt-1">Taj Lalit Bagh</div>
+      </div>
+      <div>
+        <div class="font-mono text-[10px] tracking-widest uppercase opacity-60">Window</div>
+        <div class="font-display text-lg mt-1">4 — 8 PM</div>
+      </div>
+      <div>
+        <div class="font-mono text-[10px] tracking-widest uppercase opacity-60">Total Stops</div>
+        <div class="font-display text-lg mt-1">9 across 2 days</div>
+      </div>
+      <div>
+        <div class="font-mono text-[10px] tracking-widest uppercase opacity-60">Vibe</div>
+        <div class="font-display text-lg mt-1" style="color: var(--terracotta)">Bunny-Naina</div>
+      </div>
+    </div>
+
+    <!-- Scroll hint -->
+    <div class="mt-10 flex items-center gap-3 text-sm opacity-70">
+      <span class="scroll-indicator">↓</span>
+      <span class="font-mono tracking-wider uppercase text-xs">Tap anything. Everything opens.</span>
+    </div>
+  </div>
+</header>
+
+<!-- ================== TRIP PROGRESS ================== -->
+<section class="max-w-5xl mx-auto px-6 sm:px-10 py-12">
+  <div class="fancy-rule"><span>Pre-Trip Checklist</span></div>
+
+  <div class="card-deep p-6 sm:p-8">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <h2 class="font-display text-2xl sm:text-3xl font-semibold">Before you leave</h2>
+        <p class="text-sm soft-ink mt-1">Lock these 6 things or the plan falls apart.</p>
+      </div>
+      <div class="text-right">
+        <div class="font-mono text-[10px] tracking-widest uppercase opacity-60">Prep</div>
+        <div class="font-display text-3xl font-semibold" id="prep-pct">0%</div>
+      </div>
+    </div>
+
+    <div class="progress-track mb-6"><div class="progress-fill" id="prep-bar" style="width: 0%"></div></div>
+
+    <div class="grid gap-3" id="checklist">
+      <!-- JS injected -->
+    </div>
+  </div>
+</section>
+
+<!-- ================== DAY TOGGLE ================== -->
+<section id="day-section" class="max-w-5xl mx-auto px-6 sm:px-10 pt-4 pb-8">
+  <div class="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6">
+    <div>
+      <div class="font-mono text-xs tracking-[0.35em] uppercase mb-2" style="color: var(--terracotta-deep)">
+        Choose your evening
+      </div>
+      <h2 class="font-display text-4xl sm:text-5xl font-semibold" id="day-heading">
+        Day I <span style="font-style: italic; font-weight: 300; color: var(--terracotta-deep)">— the cinematic one</span>
+      </h2>
+    </div>
+
+    <div class="day-toggle" id="day-toggle">
+      <div class="pill"></div>
+      <button data-day="1" class="active">Saturday · 26th</button>
+      <button data-day="2">Sunday · 27th</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================== DAY STRIP (mood/weather/summary) ================== -->
+<section class="max-w-5xl mx-auto px-6 sm:px-10 pb-10">
+  <div id="day-strip" class="ticket p-6 sm:p-8 stagger">
+    <!-- JS injected -->
+  </div>
+</section>
+
+<!-- ================== TIMELINE ================== -->
+<section class="max-w-5xl mx-auto px-6 sm:px-10 pb-16">
+  <div class="fancy-rule"><span>The Itinerary</span></div>
+  <div id="timeline" class="space-y-5"></div>
+
+  <!-- Day complete summary -->
+  <div id="day-complete" class="mt-8 hidden">
+    <div class="p-6 text-center ticket">
+      <div class="stamp mb-2">Day Complete</div>
+      <div class="font-display text-2xl font-semibold">You crushed it.</div>
+      <div class="text-sm soft-ink mt-2">Tap a stop to unmark it.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================== BUDGET TRACKER ================== -->
+<section class="max-w-5xl mx-auto px-6 sm:px-10 py-12">
+  <div class="fancy-rule"><span>Money Map</span></div>
+
+  <div class="card-deep p-6 sm:p-8">
+    <div class="flex flex-wrap items-end justify-between gap-4 mb-6">
+      <div>
+        <h2 class="font-display text-3xl font-semibold">The damage</h2>
+        <p class="text-sm soft-ink mt-1">Tick what you plan to spend on. Per-person estimates.</p>
+      </div>
+      <div class="text-right">
+        <div class="font-mono text-[10px] tracking-widest uppercase opacity-60">Running Total</div>
+        <div class="font-display text-4xl sm:text-5xl font-semibold budget-num" id="budget-total" style="color: var(--terracotta)">₹0</div>
+        <div class="text-xs soft-ink mt-1"><span id="budget-items">0</span> items selected</div>
+      </div>
+    </div>
+
+    <div class="grid sm:grid-cols-2 gap-3" id="budget-list">
+      <!-- JS injected -->
+    </div>
+
+    <div class="mt-5 p-4 info-pill text-xs">
+      <span class="font-semibold">Heads up:</span> <span class="soft-ink">Boat after 3 PM = ₹800 (morning slot is ₹600). Light show English tickets cost slightly more. Cabs billed at day-end by the hotel. Dinner at Ambrai can swing ₹800–1500 pp depending on drinks.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ================== PHONE BOOK ================== -->
+<section class="max-w-5xl mx-auto px-6 sm:px-10 py-12">
+  <div class="fancy-rule"><span>Numbers to save</span></div>
+
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4" id="phone-book">
+    <!-- JS injected -->
+  </div>
+</section>
+
+<!-- ================== PACKING LIST ================== -->
+<section class="max-w-5xl mx-auto px-6 sm:px-10 py-12">
+  <div class="fancy-rule"><span>Pocket Kit</span></div>
+
+  <div class="grid sm:grid-cols-2 gap-6">
+    <div class="card-deep p-6">
+      <div class="flex items-center gap-2 mb-4">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color: var(--terracotta)"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg>
+        <h3 class="font-display text-xl font-semibold">Must carry</h3>
+      </div>
+      <div id="pack-must"></div>
+    </div>
+
+    <div class="card-deep p-6">
+      <div class="flex items-center gap-2 mb-4">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color: var(--peacock)"><path d="M12 2l2.5 6.5L21 9.5l-5 4.5 1.5 7L12 17l-5.5 4L8 14l-5-4.5 6.5-1z"/></svg>
+        <h3 class="font-display text-xl font-semibold">Nice to have</h3>
+      </div>
+      <div id="pack-nice"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================== CAB TIMELINE ================== -->
+<section class="max-w-5xl mx-auto px-6 sm:px-10 py-12">
+  <div class="fancy-rule"><span>Cab Schedule</span></div>
+
+  <div class="card-deep p-6 sm:p-8">
+    <h3 class="font-display text-2xl font-semibold mb-2">Tell the driver exactly this</h3>
+    <p class="text-sm soft-ink mb-6">Book the full-day cab through Taj concierge the night before each day. Budget ₹2,500–3,500 per day.</p>
+
+    <div class="grid gap-4" id="cab-schedule"></div>
+  </div>
+</section>
+
+<!-- ================== FOOTER ================== -->
+<footer class="mt-16 py-12 text-center relative overflow-hidden" style="background: var(--ink); color: var(--cream)">
+  <svg class="absolute -bottom-16 -left-16 opacity-10" width="240" height="240" viewBox="0 0 100 100">
+    <g style="color: var(--marigold)">
+      <circle cx="50" cy="50" r="14" fill="none" stroke="currentColor" stroke-width="1"/>
+      <circle cx="50" cy="50" r="22" fill="none" stroke="currentColor" stroke-width="0.5"/>
+      <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" stroke-width="0.5"/>
+      <circle cx="50" cy="50" r="38" fill="none" stroke="currentColor" stroke-width="0.3"/>
+    </g>
+  </svg>
+
+  <div class="relative max-w-3xl mx-auto px-6">
+    <div class="font-mono text-xs tracking-[0.4em] uppercase mb-4" style="color: var(--marigold)">Final Note</div>
+    <p class="font-display text-2xl sm:text-3xl font-light italic leading-snug">
+      "Kuch aise raaste hote hain jahan ja kar lagta hai —<br>
+      <span style="color: var(--marigold); font-style: normal; font-weight: 600;">ab bas yahin ruk jao.</span>"
+    </p>
+    <div class="mt-6 text-xs font-mono tracking-widest uppercase opacity-60">— For you & Samvir, Udaipur, 2026 —</div>
+
+    <div class="mt-10 pt-6 border-t border-white/10 text-xs opacity-50">
+      Trip dossier. Built for two evenings in the City of Lakes. Go slow. Look up often.
+    </div>
+  </div>
+</footer>
+
+<!-- ================== DATA & LOGIC ================== -->
+<script>
+/* =============================================================
+   DATA
+============================================================= */
+const CHECKLIST = [
+  { id: 'cab1', label: 'Book Day 1 cab via Taj concierge', sub: 'Night of 25th · pickup at 3:20 PM porch' },
+  { id: 'cab2', label: 'Book Day 2 cab via Taj concierge', sub: 'Night of 26th · pickup at 3:20 PM porch' },
+  { id: 'ambrai', label: 'Reserve Ambrai — lake-facing table', sub: 'Call today. Non-negotiable seating.' },
+  { id: 'tickets', label: 'Buy boat + light show tickets on Day 1', sub: 'Both at City Palace, ghat counter' },
+  { id: 'cash', label: 'Pull ₹5000 cash for markets + tips', sub: 'Bada Bazaar vendors won\'t UPI' },
+  { id: 'showtime', label: 'Verify exact light show time', sub: '7:30 PM English · confirm at ticket counter' },
+];
+
+const PHONES = [
+  { label: 'Taj Lalit Bagh', number: '+91 294 350 1750', note: 'Reception + concierge' },
+  { label: 'Upre (lunch)', number: '+91 91161 73737', note: 'If you add a lunch stop' },
+  { label: 'City Palace', number: '+91 294 241 9021', note: 'Ticketing queries' },
+  { label: 'Lake Pichola Boating', number: '+91 1800 11 1363', note: 'Boat ride tickets' },
+  { label: 'Bandhani (Jagdish)', number: '+91 91665 48822', note: 'Souvenir shopping' },
+  { label: 'Emergency', number: '112', note: 'Police / medical' },
+];
+
+const PACK_MUST = [
+  'Power bank (long days, no charging window)',
+  'Cash ₹5000 + UPI backup',
+  'Comfortable walking shoes',
+  'Light scarf / shawl for Jagdish temple',
+  'Phone mount for cab (navigation)',
+  'Sunglasses (4 PM sun is still brutal)',
+  'Camera or polished phone lens'
+];
+
+const PACK_NICE = [
+  'Cotton clothes (April = 35°C+)',
+  'Water bottle to refill',
+  'Meds / basic first-aid',
+  'Portable fan',
+  'Downloaded playlist (YJHD album obviously)',
+  'Hat for the boat ride',
+  'Spare memory on phone'
+];
+
+const CAB_SCHEDULE = [
+  { time: '3:20 PM', day: 'Day 1 & 2', action: 'Pickup from Taj Lalit Bagh', extra: 'Full-day booking · driver waits in Old City' },
+  { time: '4:00 PM', day: 'Day 1 & 2', action: 'Drop at Jagdish Temple gate', extra: 'Ask driver to park near City Palace visitor lot' },
+  { time: '7:50 PM', day: 'Day 1', action: 'Pickup from Ambrai Ghat road', extra: 'Call driver 15 min before' },
+  { time: '8:35 PM', day: 'Day 2', action: 'Pickup from City Palace gate', extra: 'Just after light show ends' },
+  { time: '~9:15 PM', day: 'Day 1 & 2', action: 'Back at Taj Lalit Bagh', extra: 'Settle bill at day-end · hotel billing OK' },
+];
+
+const DAYS = {
+  1: {
+    title: 'Day I — the cinematic one',
+    subtitle: 'Heritage rush → sunset boat → lakefront dinner',
+    gradient: 'bg-theme-gradient-1',
+    mood: 'Golden hour, palace walls glowing, water everywhere',
+    temp: '35°C · light breeze by 6 PM',
+    sunset: '6:52 PM',
+    stops: [
+      {
+        id: 'jagdish',
+        time: '4:00 PM',
+        duration: '20 min',
+        name: 'Jagdish Temple',
+        color: '#E09C2E',
+        oneliner: 'Quick darshan, intricate carvings, gateway to the Old City.',
+        emoji: '🛕',
+        chips: ['Shoes off', 'Modest dress', 'Free entry'],
+        tips: [
+          'Leave Taj at 3:20 PM sharp — 35-40 min cab ride.',
+          'Tall shikhara visible from the street. Walk in, ring the bell, walk out.',
+          'Carvings on the plinth are the real attraction — 1651 AD work.',
+          'City Palace entry is a 2-minute walk from the side exit.'
+        ],
+        yjhd: 'The bylane you\'ll spot walking out — pure YJHD wedding-morning energy.',
+        tag: 'Warm-up stop'
+      },
+      {
+        id: 'citypalace',
+        time: '4:20 PM',
+        duration: '70 min',
+        name: 'City Palace',
+        color: '#C4553A',
+        oneliner: 'Bunny and Naina\'s wedding venue. Race against the 5:30 PM closing.',
+        emoji: '🏰',
+        chips: ['Last entry 4:30 PM', 'Closes 5:30 PM', '₹400 pp'],
+        tips: [
+          '⚠️ Museum last entry is 4:30 PM — you have 10 minutes from entry to buy the ticket.',
+          'Skip the audio guide. Hit the highlights fast: Mor Chowk (peacock mosaics), Sheesh Mahal, Amar Vilas hanging gardens.',
+          'While inside, walk to Rameshwar Ghat counter — buy the 5:30 PM boat ticket AND tomorrow\'s 7:30 PM light show ticket.',
+          'Don\'t exit the complex without both tickets in hand.',
+          'The balcony on the Pichola side — stand there for two minutes. This is the money shot.'
+        ],
+        yjhd: 'Aditi\'s wedding scenes were shot in these courtyards. Mor Chowk specifically.',
+        tag: 'The main event'
+      },
+      {
+        id: 'boat',
+        time: '5:30 PM',
+        duration: '75 min',
+        name: 'Lake Pichola Sunset Boat',
+        color: '#1E4A6B',
+        oneliner: 'Board at Rameshwar Ghat. Sun dips ~6:52 PM. Phones up, but look up more.',
+        emoji: '⛵',
+        chips: ['₹800 pp', 'Jag Mandir stop', 'Life jackets provided'],
+        tips: [
+          'Jetty is 2 minutes from the City Palace south exit — inside the complex.',
+          'Sit on the right side of the boat going out — best City Palace view.',
+          '30-min stop at Jag Mandir island palace mid-ride — you can grab chai at the café.',
+          'Sun sets ~6:52 PM. The 10 minutes after are the best. Put the phone down.',
+          'Return ride has the lit-up palace reflection — equally gorgeous.'
+        ],
+        yjhd: 'Tara-Bunny boat moments. Full cinema. This is why you came.',
+        tag: 'Hero stop'
+      },
+      {
+        id: 'ambrai',
+        time: '6:50 PM',
+        duration: '70 min',
+        name: 'Ambrai Restaurant (Dinner)',
+        color: '#8B3A25',
+        oneliner: 'Lakeside ghat dining with the City Palace lit up across the water.',
+        emoji: '🍽️',
+        chips: ['Reservation required', '₹1200 pp avg', 'Lake-facing only'],
+        tips: [
+          'Walk from the boat jetty — 10 minutes across the bridge.',
+          'Lake-facing table is the whole point. If they seat you inside, politely ask.',
+          'Order: laal maas (non-veg), gatte ki sabzi, dal baati churma, missi roti.',
+          'The light-show at City Palace starts 7:30 PM — you\'ll watch it from across the water for free.',
+          'Wrap by 8:00 PM. Cab pickup 7:50 from the road above the ghat.'
+        ],
+        yjhd: 'The "jitna bhi try karo" sunset vibe. Golden light on water.',
+        tag: 'The close'
+      }
+    ]
+  },
+  2: {
+    title: 'Day II — markets & mewar legend',
+    subtitle: 'Ghat chai → bazaar haul → sound & light show',
+    gradient: 'bg-theme-gradient-2',
+    mood: 'Lantern-lit streets, bargaining banter, Mewar history at full volume',
+    temp: '36°C · cooler after 7 PM',
+    sunset: '6:53 PM',
+    stops: [
+      {
+        id: 'gangaur',
+        time: '4:00 PM',
+        duration: '45 min',
+        name: 'Gangaur Ghat',
+        color: '#E09C2E',
+        oneliner: 'THE Bunny-Naina banter ghat. Kulhad chai, pigeons, lake steps.',
+        emoji: '🌊',
+        chips: ['Free', 'Kulhad chai ₹20', 'Best 4-5 PM light'],
+        tips: [
+          'Leave Taj 3:20 PM. 35-40 min drive.',
+          'Walk to the lower step — best for photos with the lake as backdrop.',
+          'Buy kulhad chai from the vendor on the top right.',
+          'Don\'t feed pigeons if you\'re allergic — they swarm.',
+          'This is THE spot for banter photos. Samvir on the bottom step, you two steps up.'
+        ],
+        yjhd: 'The exact steps where Bunny and Naina trade jabs about life. Find the angle.',
+        tag: 'YJHD moment'
+      },
+      {
+        id: 'badabazaar',
+        time: '4:45 PM',
+        duration: '60 min',
+        name: 'Bada Bazaar',
+        color: '#B8455D',
+        oneliner: 'The real deal market — juttis, silver, bangles, street food.',
+        emoji: '🛍️',
+        chips: ['Bargain hard', 'Closes 8 PM', 'Cash preferred'],
+        tips: [
+          '10-minute walk from Gangaur Ghat OR a ₹40 rickshaw.',
+          'BARGAIN: start at 40% of quoted price. Walk away once if they don\'t budge.',
+          'What to buy: leather juttis (₹400-800 good pair), silver anklets, bandhani dupattas, miniature paintings.',
+          'Grab kachori + dahi vada from a street stall — no proper dinner today.',
+          'Jagjeet\'s for silver is the most trusted shop. Ask any rickshaw driver.'
+        ],
+        yjhd: 'None specifically — but the bargaining banter is pure YJHD energy.',
+        tag: 'The haul'
+      },
+      {
+        id: 'chai',
+        time: '5:45 PM',
+        duration: '45 min',
+        name: 'Chai break + ghat chill',
+        color: '#1D6F67',
+        oneliner: 'Decompress before the show. Lakeside café, sun going down.',
+        emoji: '☕',
+        chips: ['~₹200 pp', 'Many cafés nearby', 'Flex time'],
+        tips: [
+          'Options: Jheel\'s Ginger Coffee Bar (cheap, great view), Char Bagh Café, or just sit on Gangaur Ghat again with street chai.',
+          'Sun sets 6:53 PM — you get 30-40 min of golden light.',
+          'Good time to swap market stories with Samvir.',
+          'Charge phones here — the light show will eat battery.'
+        ],
+        yjhd: 'Naina watching sunsets alone. This is your version.',
+        tag: 'The pause'
+      },
+      {
+        id: 'lightshow',
+        time: '7:15 PM',
+        duration: '75 min',
+        name: 'Mewar Sound & Light Show',
+        color: '#0B2B47',
+        oneliner: '"The Legacy of Honour" — 12 chapters of Mewar history at Manek Chowk.',
+        emoji: '✨',
+        chips: ['Starts 7:30 PM', 'English show', '₹300-600 pp'],
+        tips: [
+          'Walk to City Palace main gate → Manek Chowk is inside.',
+          'Be seated by 7:20 PM — latecomers get the worst seats.',
+          'Runtime: 60 minutes. Ends ~8:30 PM.',
+          'The Maharana narrates. Kids can get restless — but it\'s genuinely gripping.',
+          'Cab pickup 8:35 PM at the City Palace main gate — tell driver in advance.'
+        ],
+        yjhd: 'Not a YJHD scene, but Mewar history has MORE drama than the film.',
+        tag: 'Grand finale'
+      }
+    ]
+  }
+};
+
+const BUDGET_ITEMS = [
+  { id: 'cab1', label: 'Cab Day 1 (full day)', amount: 3000, split: 2 },
+  { id: 'cab2', label: 'Cab Day 2 (full day)', amount: 3000, split: 2 },
+  { id: 'cp', label: 'City Palace entry', amount: 400 },
+  { id: 'boat', label: 'Sunset boat ride', amount: 800 },
+  { id: 'ambrai', label: 'Dinner at Ambrai', amount: 1200 },
+  { id: 'chai1', label: 'Chai + snacks Day 1', amount: 150 },
+  { id: 'shop', label: 'Bada Bazaar shopping', amount: 2000 },
+  { id: 'chai2', label: 'Chai + street food Day 2', amount: 300 },
+  { id: 'lightshow', label: 'Sound & Light Show', amount: 500 },
+  { id: 'tips', label: 'Tips & misc', amount: 400 },
+];
+
+/* =============================================================
+   STATE
+============================================================= */
+let currentDay = 1;
+const state = {
+  prep: new Set(),
+  done: new Set(),
+  open: null,
+  budget: new Set(),
+  packed: new Set()
+};
+
+/* =============================================================
+   RENDERERS
+============================================================= */
+function renderChecklist() {
+  const root = document.getElementById('checklist');
+  root.innerHTML = CHECKLIST.map(item => `
+    <div class="flex items-start gap-4 p-3 hover:bg-[var(--parchment)] transition cursor-pointer" onclick="togglePrep('${item.id}')">
+      <div class="custom-check ${state.prep.has(item.id) ? 'checked' : ''}" data-id="${item.id}">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7l3.5 3.5L12 4"/></svg>
+      </div>
+      <div class="flex-1">
+        <div class="font-display font-semibold text-base ${state.prep.has(item.id) ? 'line-through opacity-60' : ''}">${item.label}</div>
+        <div class="text-xs soft-ink mt-0.5">${item.sub}</div>
+      </div>
+    </div>
+  `).join('');
+
+  const pct = Math.round((state.prep.size / CHECKLIST.length) * 100);
+  document.getElementById('prep-pct').textContent = pct + '%';
+  document.getElementById('prep-bar').style.width = pct + '%';
+}
+
+function togglePrep(id) {
+  if (state.prep.has(id)) state.prep.delete(id);
+  else state.prep.add(id);
+  renderChecklist();
+}
+
+function renderDayStrip() {
+  const d = DAYS[currentDay];
+  const strip = document.getElementById('day-strip');
+
+  strip.innerHTML = `
+    <div class="grid sm:grid-cols-4 gap-6">
+      <div class="sm:col-span-2">
+        <div class="chip ${currentDay === 1 ? 'terra' : 'peacock'} mb-3">${d.title.split('—')[0].trim()}</div>
+        <div class="font-display text-2xl sm:text-3xl font-semibold leading-tight">${d.subtitle}</div>
+        <div class="text-sm soft-ink mt-2 italic">"${d.mood}"</div>
+      </div>
+      <div>
+        <div class="font-mono text-[10px] tracking-widest uppercase opacity-60">Sunset</div>
+        <div class="font-display text-2xl font-semibold mt-1">${d.sunset}</div>
+      </div>
+      <div>
+        <div class="font-mono text-[10px] tracking-widest uppercase opacity-60">Weather</div>
+        <div class="font-display text-lg font-medium mt-1">${d.temp}</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderTimeline() {
+  const d = DAYS[currentDay];
+  const root = document.getElementById('timeline');
+
+  root.innerHTML = d.stops.map((stop, idx) => {
+    const done = state.done.has(`${currentDay}-${stop.id}`);
+    const open = state.open === `${currentDay}-${stop.id}`;
+    return `
+      <div class="stop-card p-5 sm:p-6 ${open ? 'open' : ''} ${done ? 'done' : ''}" style="--stop-color: ${stop.color}" data-key="${currentDay}-${stop.id}">
+        <div class="flex items-start gap-4 cursor-pointer" onclick="toggleStop('${currentDay}-${stop.id}')">
+          <!-- Index + time -->
+          <div class="flex flex-col items-center pt-1">
+            <div class="font-mono text-[10px] tracking-widest uppercase opacity-50">Stop ${idx + 1}</div>
+            <div class="font-display text-xl sm:text-2xl font-bold leading-none mt-1">${stop.time}</div>
+            <div class="font-mono text-[10px] opacity-50 mt-1">${stop.duration}</div>
+          </div>
+
+          <!-- Divider -->
+          <div class="w-px self-stretch" style="background: var(--ink); opacity: 0.2;"></div>
+
+          <!-- Main -->
+          <div class="flex-1 min-w-0">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-lg">${stop.emoji}</span>
+                  <h3 class="stop-title font-display text-xl sm:text-2xl font-semibold leading-tight">${stop.name}</h3>
+                </div>
+                <p class="text-sm soft-ink mt-1 leading-relaxed">${stop.oneliner}</p>
+                <div class="flex flex-wrap gap-1.5 mt-3">
+                  ${stop.chips.map(c => `<span class="chip">${c}</span>`).join('')}
+                  <span class="chip" style="background: ${stop.color}; color: white; border-color: ${stop.color};">${stop.tag}</span>
+                </div>
+              </div>
+
+              <button class="flex-shrink-0 text-2xl font-display font-light opacity-50 hover:opacity-100 transition" style="color: ${stop.color};">
+                ${open ? '−' : '+'}
+              </button>
+            </div>
+
+            <!-- Expanded detail -->
+            <div class="stop-detail">
+              <div class="mt-5 pt-5 border-t border-dashed" style="border-color: rgba(14, 23, 41, 0.25);">
+                <div class="grid gap-5 sm:grid-cols-5">
+                  <div class="sm:col-span-3">
+                    <div class="font-mono text-[10px] tracking-widest uppercase opacity-60 mb-2">Play-by-play</div>
+                    <ul class="space-y-2">
+                      ${stop.tips.map(t => `<li class="flex gap-2 text-sm leading-relaxed"><span style="color: ${stop.color};">❋</span><span>${t}</span></li>`).join('')}
+                    </ul>
+                  </div>
+                  <div class="sm:col-span-2 space-y-4">
+                    <div class="yjhd-quote text-sm">${stop.yjhd}</div>
+                    <button
+                      onclick="event.stopPropagation(); markDone('${currentDay}-${stop.id}')"
+                      class="w-full py-3 border-2 font-display font-semibold tracking-wide transition hover:shadow-[4px_4px_0_var(--ink)] hover:-translate-x-0.5 hover:-translate-y-0.5"
+                      style="border-color: var(--ink); background: ${done ? stop.color : 'transparent'}; color: ${done ? 'white' : 'var(--ink)'};">
+                      ${done ? '✓ Done' : 'Mark done'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Check if all done this day
+  const allDone = d.stops.every(s => state.done.has(`${currentDay}-${s.id}`));
+  document.getElementById('day-complete').classList.toggle('hidden', !allDone);
+}
+
+function toggleStop(key) {
+  state.open = state.open === key ? null : key;
+  renderTimeline();
+}
+
+function markDone(key) {
+  if (state.done.has(key)) state.done.delete(key);
+  else state.done.add(key);
+  renderTimeline();
+}
+
+function switchDay(day) {
+  currentDay = day;
+  state.open = null;
+
+  // Update toggle
+  const toggle = document.getElementById('day-toggle');
+  toggle.classList.toggle('day-2', day === 2);
+  toggle.querySelectorAll('button').forEach(b => {
+    b.classList.toggle('active', Number(b.dataset.day) === day);
+  });
+
+  // Update heading
+  const h = document.getElementById('day-heading');
+  if (day === 1) {
+    h.innerHTML = 'Day I <span style="font-style: italic; font-weight: 300; color: var(--terracotta-deep)">— the cinematic one</span>';
+  } else {
+    h.innerHTML = 'Day II <span style="font-style: italic; font-weight: 300; color: var(--terracotta-deep)">— markets & legend</span>';
+  }
+
+  renderDayStrip();
+  renderTimeline();
+}
+
+function renderBudget() {
+  const list = document.getElementById('budget-list');
+  list.innerHTML = BUDGET_ITEMS.map(item => {
+    const checked = state.budget.has(item.id);
+    const amt = item.split ? Math.round(item.amount / item.split) : item.amount;
+    const label = item.split ? `${item.label} <span class="text-xs opacity-60">(÷${item.split})</span>` : item.label;
+    return `
+      <label class="flex items-center justify-between gap-3 p-3 border cursor-pointer transition hover:bg-[var(--parchment)]" style="border-color: var(--ink); background: ${checked ? 'var(--parchment)' : 'var(--cream)'};" onclick="toggleBudget('${item.id}')">
+        <div class="flex items-center gap-3">
+          <div class="custom-check ${checked ? 'checked' : ''}">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7l3.5 3.5L12 4"/></svg>
+          </div>
+          <span class="text-sm font-medium">${label}</span>
+        </div>
+        <span class="font-mono text-sm font-semibold" style="color: var(--terracotta-deep);">₹${amt}</span>
+      </label>
+    `;
+  }).join('');
+
+  const total = Array.from(state.budget).reduce((sum, id) => {
+    const item = BUDGET_ITEMS.find(i => i.id === id);
+    if (!item) return sum;
+    return sum + (item.split ? Math.round(item.amount / item.split) : item.amount);
+  }, 0);
+
+  document.getElementById('budget-total').textContent = '₹' + total.toLocaleString('en-IN');
+  document.getElementById('budget-items').textContent = state.budget.size;
+}
+
+function toggleBudget(id) {
+  if (state.budget.has(id)) state.budget.delete(id);
+  else state.budget.add(id);
+  renderBudget();
+}
+
+function renderPhonebook() {
+  const root = document.getElementById('phone-book');
+  root.innerHTML = PHONES.map(p => `
+    <a href="tel:${p.number.replace(/\s/g,'')}" class="phone-card block p-5">
+      <div class="phone-label font-mono text-[10px] tracking-widest uppercase opacity-60 mb-2">${p.note}</div>
+      <div class="font-display text-xl font-semibold">${p.label}</div>
+      <div class="mt-2 font-mono text-sm">${p.number}</div>
+    </a>
+  `).join('');
+}
+
+function renderPacking() {
+  const m = document.getElementById('pack-must');
+  const n = document.getElementById('pack-nice');
+
+  m.innerHTML = PACK_MUST.map((item, i) => {
+    const id = 'm-' + i;
+    const packed = state.packed.has(id);
+    return `
+      <div class="pack-item ${packed ? 'packed' : ''}" onclick="togglePack('${id}')">
+        <div class="custom-check ${packed ? 'checked' : ''}">
+          <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7l3.5 3.5L12 4"/></svg>
+        </div>
+        <span class="pack-label text-sm">${item}</span>
+      </div>
+    `;
+  }).join('');
+
+  n.innerHTML = PACK_NICE.map((item, i) => {
+    const id = 'n-' + i;
+    const packed = state.packed.has(id);
+    return `
+      <div class="pack-item ${packed ? 'packed' : ''}" onclick="togglePack('${id}')">
+        <div class="custom-check ${packed ? 'checked' : ''}">
+          <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7l3.5 3.5L12 4"/></svg>
+        </div>
+        <span class="pack-label text-sm">${item}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+function togglePack(id) {
+  if (state.packed.has(id)) state.packed.delete(id);
+  else state.packed.add(id);
+  renderPacking();
+}
+
+function renderCabSchedule() {
+  const root = document.getElementById('cab-schedule');
+  root.innerHTML = CAB_SCHEDULE.map((c, i) => `
+    <div class="flex items-start gap-4 p-4" style="background: var(--parchment); border-left: 4px solid var(--marigold);">
+      <div class="flex-shrink-0 text-right" style="min-width: 80px;">
+        <div class="font-display text-lg font-semibold leading-tight">${c.time}</div>
+        <div class="font-mono text-[10px] tracking-widest uppercase opacity-60">${c.day}</div>
+      </div>
+      <div class="flex-1">
+        <div class="font-display text-base font-semibold">${c.action}</div>
+        <div class="text-xs soft-ink mt-1">${c.extra}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* =============================================================
+   INIT
+============================================================= */
+document.querySelectorAll('#day-toggle button').forEach(b => {
+  b.addEventListener('click', () => switchDay(Number(b.dataset.day)));
+});
+
+renderChecklist();
+renderDayStrip();
+renderTimeline();
+renderBudget();
+renderPhonebook();
+renderPacking();
+renderCabSchedule();
+
+console.log('%c Udaipur 🌅 Two evenings. One postcard.', 'font-family: serif; font-size: 16px; color: #C4553A;');
+</script>
+</body>
+</html>

@@ -5,12 +5,14 @@
 #pop{position:fixed;top:35%;left:0;right:0;text-align:center;font-size:36px;font-weight:900;color:#ff0;text-shadow:0 3px 0 #f06;opacity:0}
 @keyframes p{0%{opacity:1;transform:scale(.5)}30%{transform:scale(1.2)}100%{opacity:0;transform:translateY(-40px)}}
 #menu{position:fixed;inset:0;background:#0009;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:20px}
+#fx{position:fixed;inset:0;pointer-events:none;background:radial-gradient(#0003 1px,transparent 1.5px) 0 0/6px 6px;mix-blend-mode:multiply}
+#pop{font-family:Impact,sans-serif;-webkit-text-stroke:2px #000}
 #menu h1{font-size:44px;margin:0;color:#ff2a6d;text-shadow:0 4px 0 #ffd166}</style></head><body>
-<div id="hud"></div><div id="arr">▲</div><div id="pop"></div>
+<div id="fx"></div><div id="hud"></div><div id="arr">▲</div><div id="pop"></div>
 <div class="b" id="L" style="left:16px">◀</div><div class="b" id="R" style="left:100px">▶</div>
 <div class="b" id="D" style="right:58px;bottom:110px;font-size:16px;background:#f06a">DRIFT</div>
 <div class="b" id="G" style="right:16px">▲</div><div class="b" id="K" style="right:100px">▼</div>
-<div id="menu"><h1>NEON RUSH</h1><p>Chase the glowing rings before time runs out!<br>Rings = +time &amp; BOOST · Coins = +0.5s<br>Near-miss cars &amp; DRIFT for combo points</p><b>TAP TO START</b></div>
+<div id="menu"><h1>NEON RUSH</h1><p>Chase the glowing rings before time runs out!<br>Rings = +time &amp; BOOST · Coins = +0.5s<br>Near-miss cars &amp; DRIFT for combos<br>Hit yellow RAMPS: steer to spin, hold DRIFT to flip!</p><b>TAP TO START</b></div>
 <script>/**
  * @license
  * Copyright 2010-2021 Three.js Authors
@@ -21,9 +23,10 @@
 const cam=new THREE.PerspectiveCamera(70,1,.1,400),r=new THREE.WebGLRenderer({antialias:true});r.setPixelRatio(Math.min(2,devicePixelRatio));document.body.prepend(r.domElement);
 function sz(){r.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()}onresize=sz;sz();
 s.add(new THREE.HemisphereLight(0xfff0e0,0x557755,.8));const sun=new THREE.DirectionalLight(0xffe0b0,.7);sun.position.set(50,80,30);s.add(sun);
-const MC={},M=c=>MC[c]||(MC[c]=new THREE.MeshLambertMaterial({color:c,flatShading:true}));
+const gm=new THREE.DataTexture(new Uint8Array([90,90,90,255,190,190,190,255,255,255,255,255]),3,1,THREE.RGBAFormat);gm.minFilter=gm.magFilter=THREE.NearestFilter;gm.needsUpdate=true;
+const MC={},M=c=>MC[c]||(MC[c]=new THREE.MeshToonMaterial({color:c,gradientMap:gm}));const OL=new THREE.MeshBasicMaterial({color:0,side:THREE.BackSide});
 const B=new THREE.BoxGeometry(1,1,1);
-function box(p,c,w,h,d,x,y,z){const m=new THREE.Mesh(B,M(c));m.scale.set(w,h,d);m.position.set(x,y,z);p.add(m);return m}
+function box(p,c,w,h,d,x,y,z,o){const m=new THREE.Mesh(B,M(c));m.scale.set(w,h,d);m.position.set(x,y,z);p.add(m);if(o){const q=new THREE.Mesh(B,OL);q.scale.set(w+o,h+o,d+o);q.position.copy(m.position);p.add(q)}return m}
 const G=60,N=12,HALF=G*N/2;
 const g=new THREE.Mesh(new THREE.PlaneGeometry(2000,2000),M(0x6bb36b));g.rotation.x=-Math.PI/2;s.add(g);
 for(let i=-N/2;i<=N/2;i++){box(s,0x3a3a44,8,.05,G*N+8,i*G,0,0);box(s,0x3a3a44,G*N+8,.05,8,0,0,i*G);
@@ -33,9 +36,9 @@ for(let i=-N/2;i<N/2;i++)for(let j=-N/2;j<N/2;j++){const cx=i*G+30,cz=j*G+30;
  if(Math.random()<.2){for(let t=0;t<6;t++){const x=cx+(Math.random()-.5)*40,z=cz+(Math.random()-.5)*40,tr=new THREE.Group();
   box(tr,0x8b5a2b,.8,3,.8,0,1.5,0);const c=new THREE.Mesh(new THREE.ConeGeometry(2.5,5,6),M(0x2d8a4e));c.position.y=5;tr.add(c);tr.position.set(x,0,z);s.add(tr);solids.push({x,z,w:1.5,d:1.5})}continue}
  for(const[ox,oz]of[[-12,-12],[12,-12],[-12,12],[12,12]]){if(Math.random()<.25)continue;const h=6+Math.random()*30,w=14+Math.random()*6,x=cx+ox*.9,z=cz+oz*.9;
-  box(s,pal[Math.random()*7|0],w,h,w,x,h/2,z);box(s,0x333333,w*.6,1,w*.6,x,h+.5,z);
+  box(s,pal[Math.random()*7|0],w,h,w,x,h/2,z,.6);box(s,0x333333,w*.6,1,w*.6,x,h+.5,z);
   for(let y=3;y<h-1;y+=4)box(s,0xfff3b0,w+.2,1.2,w*.7,x,y,z);solids.push({x,z,w:w/2,d:w/2})}}
-function makeCar(c){const o=new THREE.Group();box(o,c,2.2,.7,4.4,0,.75,0);box(o,c,2,.6,2.2,0,1.35,-.2);
+function makeCar(c){const o=new THREE.Group();box(o,c,2.2,.7,4.4,0,.75,0,.2);box(o,c,2,.6,2.2,0,1.35,-.2,.2);
  box(o,0x99ddff,1.9,.5,.1,0,1.35,-1.35);box(o,0x99ddff,1.9,.45,.1,0,1.35,.95);box(o,0x111111,2.3,.3,.4,0,.6,2.2);
  box(o,0xffffcc,.5,.25,.1,-.7,.85,-2.25);box(o,0xffffcc,.5,.25,.1,.7,.85,-2.25);box(o,0xff2222,.5,.25,.1,-.7,.85,2.25);box(o,0xff2222,.5,.25,.1,.7,.85,2.25);
  const ws=[];for(const[x,z]of[[-1.15,-1.4],[1.15,-1.4],[-1.15,1.4],[1.15,1.4]]){const w=new THREE.Mesh(new THREE.CylinderGeometry(.45,.45,.4,8),M(0x222222));w.rotation.z=Math.PI/2;w.position.set(x,.45,z);o.add(w);ws.push(w)}
@@ -43,19 +46,23 @@ function makeCar(c){const o=new THREE.Group();box(o,c,2.2,.7,4.4,0,.75,0);box(o,
 const car=makeCar(0xff2a6d);box(car,0x222222,2.2,.15,.6,0,1.55,2);s.add(car);
 const traffic=[];for(let i=0;i<30;i++){const t=makeCar(pal[i%7]),ax=Math.random()<.5,lane=(Math.floor(Math.random()*N)-N/2)*G,dir=Math.random()<.5?1:-1;
  t.userData.m={ax,lane:lane+dir*2,dir,p:(Math.random()-.5)*G*N,v:.3+Math.random()*.3};s.add(t);traffic.push(t)}
-const rg=new THREE.TorusGeometry(4,.5,6,16),ring=new THREE.Mesh(rg,new THREE.MeshBasicMaterial({color:0x00ffcc}));s.add(ring);
-const beam=new THREE.Mesh(new THREE.CylinderGeometry(.4,.4,80,6),new THREE.MeshBasicMaterial({color:0x00ffcc,transparent:true,opacity:.35}));s.add(beam);
+const rg=new THREE.TorusGeometry(4,.5,6,16),ring=new THREE.Mesh(rg,new THREE.MeshBasicMaterial({color:0x00ffcc,fog:false}));ring.scale.setScalar(1.3);s.add(ring);
+const beam=new THREE.Mesh(new THREE.CylinderGeometry(1,1,120,6),new THREE.MeshBasicMaterial({color:0x00ffcc,transparent:true,opacity:.6,fog:false}));s.add(beam);
+const ramps=[];for(let i=0;i<40;i++){const ax=Math.random()<.5,l=(Math.floor(Math.random()*N)-N/2)*G,pp=(Math.floor(Math.random()*N)-N/2)*G+30,x=ax?pp:l,z=ax?l:pp;
+ const m=new THREE.Mesh(B,M(0xffd166));m.scale.set(ax?6:7,.6,ax?7:6);m.position.set(x,.6,z);m.rotation[ax?'z':'x']=.25;s.add(m);box(s,0x111111,ax?6.4:7.4,.2,ax?7.4:6.4,x,.05,z);ramps.push({x,z})}
+let y=0,vy=0,air=0,spin=0,flip=0;
 const coins=[],cg=new THREE.OctahedronGeometry(.8);
 const parts=[];function burst(x,y,z,c,n){for(let i=0;i<n;i++){const m=new THREE.Mesh(B,M(c));m.scale.setScalar(.4);m.position.set(x,y,z);m.userData.v=new THREE.Vector3((Math.random()-.5)*.6,Math.random()*.6,(Math.random()-.5)*.6);m.userData.l=40;s.add(m);parts.push(m)}}
 const $=id=>document.getElementById(id),k={};
 for(const id of'LRGKD'){const e=$(id);e.ontouchstart=e.onmousedown=ev=>{ev.preventDefault();k[id]=1};e.ontouchend=e.ontouchcancel=e.onmouseup=()=>k[id]=0}
 const KM={ArrowLeft:'L',ArrowRight:'R',ArrowUp:'G',ArrowDown:'K',' ':'D'};onkeydown=e=>k[KM[e.key]]=1;onkeyup=e=>k[KM[e.key]]=0;
 let sp,a,drift,time,score,combo,ct,rings,state='menu',best=0,shake=0,boost=0;try{best=+localStorage.db||0}catch(e){}
-function placeRing(){const ax=Math.random()<.5,l=(Math.floor(Math.random()*N)-N/2)*G,p=(Math.random()-.5)*G*(N-2);
- const x=ax?p:l,z=ax?l:p;ring.position.set(x,4.5,z);ring.rotation.y=ax?Math.PI/2:0;beam.position.set(x,40,z);
+function placeRing(){const ax=Math.random()<.5,rx=Math.round(car.position.x/G),rz=Math.round(car.position.z/G),o=()=>(Math.random()<.5?-1:1)*(1+(Math.random()*2|0));
+ const l=(ax?Math.max(-5,Math.min(5,rz+o())):Math.max(-5,Math.min(5,rx+o())))*G,p=((ax?rx:rz)*G+(Math.random()-.5)*G*3)%(HALF-20);
+ const x=ax?p:l,z=ax?l:p;ring.position.set(x,5,z);ring.rotation.y=ax?Math.PI/2:0;beam.position.set(x,60,z);
  for(const c of coins)s.remove(c);coins.length=0;
  const dx=x-car.position.x,dz=z-car.position.z;for(let i=1;i<8;i++){const c=new THREE.Mesh(cg,M(0xffd700));c.position.set(car.position.x+dx*i/8,1.5,car.position.z+dz*i/8);s.add(c);coins.push(c)}}
-function start(){car.position.set(0,0,0);sp=0;a=0;drift=0;time=30;score=0;combo=1;ct=0;rings=0;boost=0;state='play';$('menu').style.display='none';placeRing()}
+function start(){car.position.set(0,0,0);sp=0;a=0;drift=0;time=30;score=0;y=vy=spin=flip=0;combo=1;ct=0;rings=0;boost=0;state='play';$('menu').style.display='none';placeRing()}
 $('menu').onclick=$('menu').ontouchstart=e=>{e.preventDefault();start()};
 function pop(t){const e=$('pop');e.textContent=t;e.style.animation='none';e.offsetHeight;e.style.animation='p .8s'}
 function hitSolid(x,z){for(const o of solids)if(Math.abs(x-o.x)<o.w+1.2&&Math.abs(z-o.z)<o.d+1.2)return 1;return Math.abs(x)>HALF+20||Math.abs(z)>HALF+20}
@@ -74,14 +81,19 @@ let last=performance.now();
   drift+=((dr?st*.5:0)-drift)*.1*dt;
   if(dr&&st){score+=Math.round(sp*2*combo*dt);if(Math.random()<.3)burst(car.position.x,.3,car.position.z,0xdddddd,1)}
   const nx=car.position.x-Math.sin(a)*sp*dt,nz=car.position.z-Math.cos(a)*sp*dt;
+  if(y<=0){for(const q of ramps)if(Math.abs(nx-q.x)<3.5&&Math.abs(nz-q.z)<3.5&&Math.abs(sp)>.7){vy=.35+Math.abs(sp)*.2;y=.1;air=0;spin=0;flip=0;pop('AIR!');break}}
+  if(y>0){vy-=.018*dt;y+=vy*dt;air+=dt/60;spin+=st*.12*dt;if(k.D)flip+=.15*dt;
+   if(y<=0){y=0;const tr=Math.round(Math.abs(spin)/(Math.PI*2)),fl=Math.round(Math.abs(flip)/(Math.PI*2)),bad=Math.abs(spin%(Math.PI*2))>1&&Math.abs(spin%(Math.PI*2))<5.3||Math.abs(flip%(Math.PI*2))>1&&Math.abs(flip%(Math.PI*2))<5.3;
+    if(bad){sp*=.2;shake=14;combo=1;pop('WIPEOUT!');burst(nx,1,nz,0xff3333,12)}else{const pts=Math.round((air*100+tr*300+fl*500)*combo);score+=pts;time+=tr+fl*2;if(tr||fl){combo+=tr+fl;ct=3;boost=1}
+     pop((tr?tr*360+'° SPIN ':'')+(fl?fl+'x FLIP ':'')+'+'+pts);burst(nx,.5,nz,0xffd166,15)}spin=flip=0}}
   if(hitSolid(nx,nz)){sp*=-.4;shake=10;combo=1;burst(nx,1,nz,0xffaa00,8)}else car.position.set(nx,0,nz);
-  car.rotation.y=a+drift;car.rotation.z=-st*Math.min(.08,sp*.06);for(const w of car.userData.w)w.rotation.x+=sp*.5*dt;
+  car.position.y=y;car.rotation.set(flip,a+drift+spin,-st*Math.min(.08,sp*.06),'YXZ');for(const w of car.userData.w)w.rotation.x+=sp*.5*dt;
   for(const t of traffic){const d=t.position.distanceTo(car.position);
    if(d<3.2){sp*=-.5;shake=14;time-=2;combo=1;pop('CRASH -2s');burst(car.position.x,1,car.position.z,0xff3333,14);car.position.x+=(car.position.x-t.position.x)*.5;car.position.z+=(car.position.z-t.position.z)*.5}
    else if(d<5.5&&Math.abs(sp)>1&&!t.userData.nm){t.userData.nm=1;score+=50*combo;combo++;ct=3;pop('NEAR MISS x'+combo)}
    else if(d>10)t.userData.nm=0}
   for(let i=coins.length-1;i>=0;i--)if(coins[i].position.distanceTo(car.position)<3){burst(coins[i].position.x,1.5,coins[i].position.z,0xffd700,5);s.remove(coins[i]);coins.splice(i,1);score+=10*combo;time+=.5}
-  if(ring.position.distanceTo(new THREE.Vector3(car.position.x,4.5,car.position.z))<5){rings++;const b=Math.max(4,10-rings*.4);time+=b;score+=200*combo;combo++;ct=3;boost=1.5;
+  if(ring.position.distanceTo(new THREE.Vector3(car.position.x,5,car.position.z))<6.5){rings++;const b=Math.max(4,10-rings*.4);time+=b;score+=200*combo;combo++;ct=3;boost=1.5;
    pop('+'+b.toFixed(1)+'s BOOST!');burst(ring.position.x,4,ring.position.z,0x00ffcc,25);placeRing()}
   if(time<=0){time=0;state='over';if(score>best){best=score;try{localStorage.db=best}catch(e){}}
    $('menu').innerHTML='<h1>TIME UP</h1><p>Score '+score+'<br>Rings '+rings+'<br>Best '+best+'</p><b>TAP TO RACE AGAIN</b>';$('menu').style.display='flex'}
@@ -90,5 +102,5 @@ let last=performance.now();
  }
  const cd=boost>0?12:10;shake*=.85;
  cam.position.set(car.position.x+Math.sin(a)*cd+(Math.random()-.5)*shake*.05,5+(state==='menu'?3:0),car.position.z+Math.cos(a)*cd);
- cam.fov=70+Math.abs(sp||0)*8;cam.updateProjectionMatrix();cam.lookAt(car.position.x,1.5,car.position.z);r.render(s,cam)})(last);
+ cam.fov=70+Math.abs(sp||0)*8;cam.updateProjectionMatrix();cam.position.y+=y*.7;cam.lookAt(car.position.x,1.5+y,car.position.z);r.render(s,cam)})(last);
 </script></body></html>

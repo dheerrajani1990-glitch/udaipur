@@ -20,7 +20,7 @@ for(let i=-10;i<=10;i++){for(const v of[0,1]){const rd=new THREE.Mesh(B,M(0x444)
 for(let i=0;i<400;i++){const h=5+Math.random()*25,b=new THREE.Mesh(B,M(new THREE.Color().setHSL(Math.random(),.3,.6)));b.scale.set(15,h,15);
 b.position.set((Math.floor(Math.random()*20)-10)*60+30,h/2,(Math.floor(Math.random()*20)-10)*60+30);s.add(b)}
 const car=new THREE.Group(),body=new THREE.Mesh(B,M(0xd22));body.scale.set(2,1,4);body.position.y=.7;car.add(body);
-const top=new THREE.Mesh(B,M(0x222));top.scale.set(1.8,.7,2);top.position.set(0,1.5,.3);car.add(top);s.add(car);
+const roof=new THREE.Mesh(B,M(0x222));roof.scale.set(1.8,.7,2);roof.position.set(0,1.5,.3);car.add(roof);s.add(car);
 const k={};for(const id of'LRGK'){const e=document.getElementById(id);e.ontouchstart=e.onmousedown=ev=>{ev.preventDefault();k[id]=1};e.ontouchend=e.onmouseup=()=>k[id]=0}
 onkeydown=e=>k[{ArrowLeft:'L',ArrowRight:'R',ArrowUp:'G',ArrowDown:'K'}[e.key]]=1;onkeyup=e=>k[{ArrowLeft:'L',ArrowRight:'R',ArrowUp:'G',ArrowDown:'K'}[e.key]]=0;
 let sp=0,a=0;(function f(){requestAnimationFrame(f);

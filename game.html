@@ -1,0 +1,16 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><title>Dodge</title>
+<style>body{margin:0;background:#111;color:#fff;font-family:sans-serif;overflow:hidden;touch-action:none}canvas{display:block}#s{position:fixed;top:10px;left:10px;font-size:20px}</style></head><body>
+<div id="s">0</div><canvas id="c"></canvas><script>
+const c=document.getElementById('c'),x=c.getContext('2d'),S=document.getElementById('s');let W,H,p,r,t,sc,dead,best=+(localStorage.b||0);
+function size(){W=c.width=innerWidth;H=c.height=innerHeight}onresize=size;size();
+function reset(){p={x:W/2,y:H-80};r=[];t=0;sc=0;dead=false}reset();
+function mv(e){const q=e.touches?e.touches[0]:e;p.x=q.clientX}
+addEventListener('touchmove',mv);addEventListener('mousemove',mv);
+addEventListener('touchstart',e=>{if(dead)reset();mv(e)});addEventListener('mousedown',()=>dead&&reset());
+function f(){requestAnimationFrame(f);x.fillStyle='#111';x.fillRect(0,0,W,H);
+if(!dead){t++;sc=t/6|0;if(Math.random()<.03+t/20000)r.push({x:Math.random()*W,y:-20,s:3+Math.random()*3+t/600,z:10+Math.random()*15});
+for(const o of r){o.y+=o.s;if(Math.hypot(o.x-p.x,o.y-p.y)<o.z+14){dead=true;if(sc>best)localStorage.b=best=sc}}r=r.filter(o=>o.y<H+40)}
+x.fillStyle='#f55';for(const o of r){x.beginPath();x.arc(o.x,o.y,o.z,0,7);x.fill()}
+x.fillStyle='#5cf';x.beginPath();x.arc(p.x,p.y,14,0,7);x.fill();
+S.textContent=sc+'  best '+best;if(dead){x.fillStyle='#fff';x.font='28px sans-serif';x.textAlign='center';x.fillText('Tap to retry',W/2,H/2)}}f();
+</script></body></html>

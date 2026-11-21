@@ -3,14 +3,14 @@
 canvas{display:block;width:100vw;height:100vh;image-rendering:pixelated;object-fit:contain}
 .b{position:fixed;box-sizing:border-box;bottom:12px;width:56px;height:56px;border-radius:50%;background:#ffffff14;border:2px solid #ffffff40;color:#fffc;font:bold 12px monospace;display:flex;align-items:center;justify-content:center}</style></head><body>
 <canvas id="c" width="256" height="144"></canvas>
-<div class="b" id="L" style="left:12px">◀</div><div class="b" id="R" style="left:78px">▶</div>
+<div class="b" id="JS" style="left:14px;width:96px;height:96px"><div id="jk" style="position:absolute;width:38px;height:38px;border-radius:50%;background:#fff5;pointer-events:none"></div></div>
 <div class="b" id="A" style="right:12px;width:84px;height:84px;border-color:#f8a8;background:#f8a2">SLASH<div id="kn" style="position:absolute;width:26px;height:26px;border-radius:50%;background:#f8a8;pointer-events:none"></div></div>
 <div class="b" id="S" style="right:108px;bottom:12px;border-color:#fd88">KAMI</div>
 <script>
 const c=document.getElementById('c'),x=c.getContext('2d'),W=256,H=144,GY=104;
 // ---------- silhouette sprites: k=body h=rim e=eye ----------
 const S=a=>a.map(r=>[...r]);
-const HERO=[S(["......hhhhhh........", "....hhkkkkkkhh......", "..hkkkkkkkkkkkkh....", ".hkkkkkkkkkkkkkkkh..", "......kkkkkkk.......", "......kkkekek.......", ".....kkkkkkkk.......", "....kkmkkkkkkk......", "...kkmmkkkkkkkk.....", "...kkmkkkkkkkkkk....", "...kkmkkkkkkkkkhhhhh", "...kkkkkkkkk........", "..mhhhhhhhh.........", ".mkkkkkkkkkk........", "kkkmkkkkkkkkk.......", "kkmkkk...kkkkk......", "kkkk......kkkkk.....", "kkk........kkkkk....", "kk..........kkkk....", "km...........kkk....", "km...........kkk....", "kkk..........kkkk..."]),S(["......hhhhhh........", "....hhkkkkkkhh......", "..hkkkkkkkkkkkkh....", ".hkkkkkkkkkkkkkkkh..", "......kkkkkkk.......", "......kkkekek.......", ".....kkkkkkkk.......", "....kkmkkkkkkk......", "...kkmmkkkkkkkk.....", "...kkmkkkkkkkkkk....", "...kkmkkkkkkkkkhhhhh", "...kkkkkkkkk........", "..mhhhhhhhh.........", ".mkkkkkkkkkk........", "..kkmkkkkkkk........", "...kkkk.kkkk........", "..kkk....kkkk.......", ".kkk......kkk.......", "kkk........kkk......", "km..........kk......", "m...........kkk.....", ".............kk....."])];
+const HERO=[S(["......hhhhhh........", "....hhkkkkkkhh......", "..hkkkkkkkkkkkkh....", ".hkkkkkkkkkkkkkkkh..", "......kkkkkkk.......", "......kkkekek.......", ".....kkkkkkkk.......", "....kkmkkkkkkk......", "...kkmmkkkkkkkk.....", "...kkmkkkkkkkkkk....", "...kkmkkkkkkkkkhhhhh", "...kkkkkkkkk........", "..mhhhhhhhh.........", ".mkkkkkkkkkk........", ".kkmkkkkkkk.........", ".kkmkk..kkkk........", ".kkkk....kkk........", ".kkk.....kkk........", ".kk......kkk........", ".km.......kk........", ".km.......kk........", "kkk......kkk........"]),S(["......hhhhhh........", "....hhkkkkkkhh......", "..hkkkkkkkkkkkkh....", ".hkkkkkkkkkkkkkkkh..", "......kkkkkkk.......", "......kkkekek.......", ".....kkkkkkkk.......", "....kkmkkkkkkk......", "...kkmmkkkkkkkk.....", "...kkmkkkkkkkkkk....", "...kkmkkkkkkkkkhhhhh", "...kkkkkkkkk........", "..mhhhhhhhh.........", ".mkkkkkkkkkk........", "..kkmkkkkkk.........", "...kkkk.kkk.........", "..kkk...kkk.........", ".kkk.....kkk........", ".kk......kk.........", ".km.......kk........", ".m........kk........", "..........kk........"])];
 const NIN=[S(['.....kk.....','....kkkk....','...kkkkkk...','...kekkek...','...kkkkkk...','....kkkk....','..kkkkkkkk..','.k.kkkkkk.k.','...kkkkkk...','...kkkkkk...','...kk..kk...','..kk....kk..']),
  S(['.....kk.....','....kkkk....','...kkkkkk...','...kekkek...','...kkkkkk...','....kkkk....','..kkkkkkkk..','.k.kkkkkk.k.','...kkkkkk...','...kkkkkk...','....kkkk....','....kk.kk...'])];
 const ONI=S(['h..........h','hk..kkkk..kh','.kkkkkkkkkk.','..kkkkkkkk..','..kekkkkek..','..kkkkkkkk..','.kkkkkkkkkk.','kkkkkkkkkkkk','kkkkkkkkkkkk','k.kkkkkkkk.k','k.kkkkkkkk.k','..kkkkkkkk..','..kkkkkkkk..','..kkk..kkk..','.kkkk..kkkk.']);
@@ -83,8 +83,13 @@ function load(i){lv=i;lvScore=score;const L=LV[i],R=rnd(100+i);P={x:30,y:GY,vx:0
   if(L.fl)for(let X=320;X<LEN-60;X+=280/L.fl+R()*160)en.push(mk('f',X|0,GY-58-R()*24|0,null))}}
 function tap(){if(st=='title'){score=0;kami=0;load(0);st='play'}else if(st=='over'){score=lvScore;kami=0;load(lv);st='play'}else if(st=='win'){score=0;kami=0;load(0);st='play'}}
 // ---- input ----
-const k={};for(const id of'LRS'){const e=document.getElementById(id);e.addEventListener('touchstart',v=>{v.preventDefault();k[id]=1;tap()},{passive:false});
+const k={};for(const id of'S'){const e=document.getElementById(id);e.addEventListener('touchstart',v=>{v.preventDefault();k[id]=1;tap()},{passive:false});
  e.addEventListener('touchend',()=>k[id]=0);e.addEventListener('touchcancel',()=>k[id]=0);e.onmousedown=v=>{v.preventDefault();k[id]=1;tap()};e.onmouseup=e.onmouseleave=()=>k[id]=0}
+let jx=0,jid=null,jsx=0;const js=document.getElementById('JS'),jk=document.getElementById('jk');
+function jm(X){jx=cl((X-jsx)/34,-1,1);jk.style.transform=`translateX(${jx*30}px)`}
+js.addEventListener('touchstart',e=>{e.preventDefault();if(st!='play')tap();const t=e.changedTouches[0];jid=t.identifier;const b=js.getBoundingClientRect();jsx=b.left+b.width/2;jm(t.clientX)},{passive:false});
+addEventListener('touchmove',e=>{for(const t of e.changedTouches)if(t.identifier===jid)jm(t.clientX)},{passive:false});
+const je=e=>{for(const t of e.changedTouches)if(t.identifier===jid){jid=null;jx=0;jk.style.transform=''}};addEventListener('touchend',je);addEventListener('touchcancel',je);
 const pad=document.getElementById('A'),knob=document.getElementById('kn');
 function aimStart(id,X,Y){if(st!='play'){tap();return}if(aim||P.ch<=0||clear)return;aim={id,sx:X,sy:Y,dx:0,dy:0}}
 function aimMove(id,X,Y){if(!aim||aim.id!==id)return;aim.dx=X-aim.sx;aim.dy=Y-aim.sy;const l=Math.hypot(aim.dx,aim.dy),m=Math.min(l,26);knob.style.transform=l?`translate(${aim.dx/l*m}px,${aim.dy/l*m}px)`:''}
@@ -114,7 +119,7 @@ function step(dt){const L=LV[lv];if(mt>0)mt--;
  // player
  if(P.dash>0){P.dash-=dt;P.vx=P.dx*6.5;P.vy=P.dy*6.5;fx.push({x:P.x,y:P.y,l:10,ghost:1,f:P.f});const s=fx.find(f=>f.streak&&f.l==16||f.streak&&f.live);if(s){s.live=1;s.x1=P.x+7;s.y1=P.y-11}
   if(P.dash<=0){P.vx*=.6;P.vy*=.35;for(const f of fx)f.live=0}}
- else{const kb=aim&&aim.id=='k',tg=kb?0:(k.R?1.8:0)-(k.L?1.8:0);if(tg){P.vx+=(tg-P.vx)*(P.gr?.25:.07)*dt;P.f=tg<0}else if(P.gr)P.vx*=Math.pow(.75,dt);
+ else{const kb=aim&&aim.id=='k',tg=kb?0:((k.R?1:0)-(k.L?1:0)||jx)*1.8;if(tg){P.vx+=(tg-P.vx)*(P.gr?.25:.07)*dt;P.f=tg<0}else if(P.gr)P.vx*=Math.pow(.75,dt);
   if(k.J&&!kb&&P.gr){P.vy=-4.4;k.J=0;P.gr=0}P.vy+=.24*dt}
  const oy=P.y;P.x+=P.vx*dt;P.y+=P.vy*dt;P.gr=0;
  if(P.y>=GY){P.y=GY;if(P.vy>0)P.vy=0;P.gr=1}else if(P.vy>=0)for(const p of plats)if(oy<=p.y+.5&&P.y>=p.y&&P.x+9>p.x&&P.x+3<p.x+p.w){P.y=p.y;P.vy=0;P.gr=1;if(P.dash>0&&P.dy>.4)P.dash=0;break}

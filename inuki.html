@@ -1,0 +1,102 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><title>Inuki</title>
+<style>body{margin:0;background:#000;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;font-family:monospace}
+canvas{display:block;width:100vw;height:100vh;image-rendering:pixelated;object-fit:contain}
+.b{position:fixed;bottom:18px;width:64px;height:64px;border-radius:12px;background:#fff2;border:2px solid #fff6;color:#fff;font:bold 15px monospace;display:flex;align-items:center;justify-content:center}</style></head><body>
+<canvas id="c" width="256" height="144"></canvas>
+<div class="b" id="L" style="left:14px">◀</div><div class="b" id="R" style="left:88px">▶</div>
+<div class="b" id="J" style="right:88px">JUMP</div><div class="b" id="A" style="right:14px;background:#c224">DASH</div>
+<div class="b" id="S" style="right:14px;bottom:92px;background:#fc04">KAMI</div>
+<script>
+const c=document.getElementById('c'),x=c.getContext('2d'),W=256,H=144,GY=118;x.imageSmoothingEnabled=false;
+const k={};for(const id of'LRJAS'){const e=document.getElementById(id);e.ontouchstart=e.onmousedown=v=>{v.preventDefault();k[id]=1;tap()};e.ontouchend=e.ontouchcancel=e.onmouseup=()=>k[id]=0}
+const KM={ArrowLeft:'L',ArrowRight:'R',ArrowUp:'J',' ':'J',x:'A',z:'S'};onkeydown=e=>{k[KM[e.key]]=1;tap()};onkeyup=e=>k[KM[e.key]]=0;c.onclick=()=>tap();
+// pixel sprites: chars -> colors
+const PAL={k:'#111',r:'#c22',w:'#eee',s:'#e9b',g:'#888',y:'#fc3',p:'#639',o:'#e62',b:'#358',d:'#422'};
+function spr(rows){return rows.map(r=>[...r])}
+const NINJA=[spr(['..kkkk..','.kkkkkk.','.kswswk.','.kkkkkkr','..kkkk.r','.kkrrkk.','k.kkkk.k','..kkkk..','..k..k..','.kk..kk.']),
+ spr(['..kkkk..','.kkkkkk.','.kswswk.','.kkkkkkr','..kkkk.r','.kkrrkk.','k.kkkk.k','..kkkk..','.k....k.','kk....kk'])];
+const BANDIT=[spr(['..yyyy..','.yyyyyy.','..dssd..','..ssss..','.oooooo.','o.oooo.o','..oooo..','..d..d..','.dd..dd.']),
+ spr(['..yyyy..','.yyyyyy.','..dssd..','..ssss..','.oooooo.','o.oooo.o','..oooo..','.d....d.','dd....dd'])];
+const ARCHER=[spr(['..bbbb..','.bbbbbb.','..swsw..','..ssss..','.bbbbbbd','b.bbbb.d','..bbbb.d','..k..k..','.kk..kk.'])];
+const ONI=spr(['w..rrrr..w','w.rrrrrr.w','.rryrryrr.','.rrrrrrrr.','.rkwkwkwr.','..rrrrrr..','rrppppppr.','r.pppppp.r','r.pppppp.r','..pppppp..','..pp..pp..','.rrr..rrr.']);
+function draw(sp,X,Y,f,sc=1){for(let i=0;i<sp.length;i++)for(let j=0;j<sp[i].length;j++){const ch=sp[i][j];if(ch=='.')continue;x.fillStyle=PAL[ch];x.fillRect(Math.round(X+(f?sp[i].length-1-j:j)*sc),Math.round(Y+i*sc),sc,sc)}}
+const LV=[{n:'I. Foothills',sky:['#f9a','#fd8'],m:['#a68','#746'],g:'#3a5',kills:12,arch:0},
+ {n:'II. Bamboo Pass',sky:['#9d9','#dfb'],m:['#585','#363'],g:'#252',kills:16,arch:.25},
+ {n:'III. Frozen Peak',sky:['#9bf','#eef'],m:['#ccd','#99a'],g:'#eef',kills:20,arch:.4,snow:1},
+ {n:'IV. Oni Shrine',sky:['#311','#a32'],m:['#522','#311'],g:'#422',kills:8,arch:.4,boss:1}];
+let st='title',lv,P,en,ar,fx,cam,kills,combo,ct,kami,shake,slow,msg,mt,boss,score,best=0;try{best=+localStorage.ib||0}catch(e){}
+function load(i){lv=i;P={x:20,y:GY,vx:0,vy:0,f:0,hp:5,inv:0,dash:0,dcd:0,an:0};en=[];ar=[];fx=[];cam=0;kills=0;combo=0;ct=0;slow=0;boss=null;msg=LV[i].n;mt=120;
+ if(LV[i].boss)boss={x:220,y:GY,hp:30,mhp:30,t:0,f:1,hit:0}}
+function tap(){if(st=='title'||st=='over'||st=='win'){score=0;kami=0;load(0);st='play'}}
+function spawn(){const L=LV[lv],a=Math.random()<L.arch;en.push({x:cam+(Math.random()<.7?W+10:-10),y:GY,a,t:Math.random()*60,hp:1,an:0})}
+function part(X,Y,col,n,sp=2){for(let i=0;i<n;i++)fx.push({x:X,y:Y,vx:(Math.random()-.5)*sp*2,vy:-Math.random()*sp*1.5,l:20+Math.random()*20,c:col})}
+function kill(e){part(e.x+4,e.y-5,'#c22',14);part(e.x+4,e.y-5,'#fff',4);kills++;combo++;ct=90;score+=10*combo;kami=Math.min(100,kami+8);shake=4;slow=4;
+ fx.push({x:e.x,y:e.y-20,t:'+'+10*combo,l:40,vy:-.5,vx:0})}
+function hurt(){if(P.inv>0||P.dash>0)return;P.hp--;P.inv=60;shake=8;combo=0;part(P.x+4,P.y-5,'#fff',8);if(P.hp<=0){st='over';if(score>best){best=score;try{localStorage.ib=best}catch(e){}}}}
+let lt=0,sk=0;
+function step(){
+ const L=LV[lv];if(mt>0)mt--;
+ // player
+ if(P.dash>0){P.dash--;P.vx=P.f?-6:6;fx.push({x:P.x,y:P.y-10,l:8,ghost:1,f:P.f})}else{
+  P.vx=(k.R?1.6:0)-(k.L?1.6:0);if(k.R)P.f=0;if(k.L)P.f=1}
+ if(k.J&&P.y>=GY){P.vy=-4.2;k.J=0}
+ if(k.A&&P.dcd<=0){P.dash=10;P.dcd=22;k.A=0;P.slash=12;part(P.x+4,P.y-5,'#fff',4,1)}
+ if(k.S&&kami>=100){kami=0;k.S=0;shake=14;slow=30;fx.push({flash:1,l:20});for(const e of en)kill(e);en=[];ar=[];if(boss){boss.hp-=8;boss.hit=10}}
+ P.dcd--;P.inv--;P.slash>0&&P.slash--;P.vy+=.25;P.x+=P.vx;P.y=Math.min(GY,P.y+P.vy);if(P.y>=GY)P.vy=0;P.x=Math.max(cam,P.x);
+ if(P.vx)P.an+=.2;
+ const tc=P.x-90;if(tc>cam)cam=tc;
+ if(ct>0)ct--;else combo=0;
+ // enemies
+ if(!boss&&kills+en.length<L.kills&&en.length<4+lv&&Math.random()<.025+lv*.01)spawn();
+ if(boss&&en.length<2&&Math.random()<.01)spawn();
+ for(let i=en.length-1;i>=0;i--){const e=en[i];e.t++;const d=P.x-e.x;
+  if(e.a){if(Math.abs(d)>60)e.x+=Math.sign(d)*.5;if(e.t%110==0)ar.push({x:e.x+4,y:e.y-6,vx:Math.sign(d)*2.2})}
+  else{e.x+=Math.sign(d)*(.6+lv*.15);e.an+=.15}
+  if(Math.abs(d)<9&&Math.abs(P.y-e.y)<12){if(P.dash>0||P.slash>0){kill(e);en.splice(i,1);continue}else hurt()}}
+ for(let i=ar.length-1;i>=0;i--){const a=ar[i];a.x+=a.vx;if(P.slash>0&&Math.abs(a.x-P.x-4)<12&&Math.abs(a.y-P.y+5)<10){part(a.x,a.y,'#fc3',5);ar.splice(i,1);score+=5;continue}
+  if(Math.abs(a.x-P.x-4)<5&&Math.abs(a.y-P.y+5)<6){hurt();ar.splice(i,1);continue}if(Math.abs(a.x-P.x)>300)ar.splice(i,1)}
+ // boss
+ if(boss){const b=boss;b.t++;b.hit>0&&b.hit--;const d=P.x-b.x;b.f=d<0;
+  if(b.x<cam+20)b.x=cam+20;if(b.x>cam+W-30)b.x=cam+W-30;
+  const ph=b.t%200;if(ph<120)b.x+=Math.sign(d)*.5;else if(ph<140){}else if(ph<170)b.x+=Math.sign(d)*3.2;
+  if(b.t%150==0)for(let j=-1;j<=1;j++)ar.push({x:b.x+10,y:b.y-14+j*6,vx:Math.sign(d)*2,fire:1});
+  if(Math.abs(d+4)<16&&Math.abs(P.y-b.y)<20){if(P.dash>0&&b.hit<=0){b.hp-=2;b.hit=15;shake=6;slow=6;part(b.x+10,b.y-12,'#c22',12);score+=25;kami=Math.min(100,kami+6)}else if(P.dash<=0)hurt()}
+  if(b.hp<=0){part(b.x+10,b.y-12,'#c22',60,4);part(b.x+10,b.y-12,'#fc3',40,4);boss=null;kills=99;shake=20;slow=40;score+=500}}
+ for(let i=fx.length-1;i>=0;i--){const f=fx[i];f.l--;if(f.vx!=null){f.x+=f.vx;f.y+=f.vy;if(!f.t)f.vy+=.15}if(f.l<=0)fx.splice(i,1)}
+ if(kills>=L.kills&&!boss&&en.length==0){if(lv==3){st='win';if(score>best){best=score;try{localStorage.ib=best}catch(e){}}}else{P.hp=Math.min(5,P.hp+1);load(lv+1)}}
+}
+function render(){const L=LV[lv]||LV[0],g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,L.sky[0]);g.addColorStop(1,L.sky[1]);x.fillStyle=g;x.fillRect(0,0,W,H);
+ const sx=shake>0?(Math.random()-.5)*shake:0,sy=shake>0?(Math.random()-.5)*shake:0;x.save();x.translate(sx|0,sy|0);
+ x.fillStyle=lv==3?'#f44':'#fff8';x.beginPath();x.arc(200,30,14,0,7);x.fill();
+ for(let l=0;l<2;l++){x.fillStyle=L.m[l];const pr=(l+1)*.25,o=(cam||0)*pr;x.beginPath();x.moveTo(0,H);for(let i=-1;i<12;i++){const mx=i*40-(o%40),hh=(Math.sin((i+Math.floor(o/40))*12.9)*.5+.5)*30+30+l*-10;x.lineTo(mx,GY-hh+l*25);x.lineTo(mx+20,GY-10+l*10)}x.lineTo(W,H);x.fill()}
+ if(lv==1){x.fillStyle='#363';for(let i=0;i<14;i++){const bx=((i*23-(cam||0)*.6)%320+320)%320-30;x.fillRect(bx,20,3,100)}}
+ x.fillStyle=L.g;x.fillRect(0,GY,W,H-GY);x.fillStyle='#0003';for(let i=0;i<20;i++)x.fillRect(((i*17-(cam||0))%W+W)%W,GY+4+(i%3)*6,6,2);
+ if(st=='title'){draw(NINJA[0],116,70,0,3);txt('INUKI',128,30,'#c22',2);txt('the tale of a ninja',128,48,'#fff');txt('tap to begin',128,128,(Date.now()/400|0)%2?'#fff':'#fc3');x.restore();return}
+ x.save();x.translate(-Math.round(cam),0);
+ for(const f of fx)if(f.ghost){x.globalAlpha=f.l/16;draw(NINJA[0],f.x,f.y-10,f.f);x.globalAlpha=1}
+ for(const e of en)draw(e.a?ARCHER[0]:BANDIT[(e.an|0)%2],e.x,e.y-9,P.x<e.x);
+ for(const a of ar){x.fillStyle=a.fire?'#f80':'#dcb';x.fillRect(a.x,a.y,a.fire?4:6,a.fire?3:1)}
+ if(boss){if(boss.hit%4<2)draw(ONI,boss.x,boss.y-24,boss.f,2)}
+ if(!(P.inv>0&&P.inv%6<3))draw(NINJA[P.vx&&P.y>=GY?(P.an|0)%2:0],P.x,P.y-10,P.f);
+ if(P.slash>0){x.strokeStyle='#fff';x.lineWidth=2;x.globalAlpha=P.slash/12;x.beginPath();const cx=P.x+4+(P.f?-6:6);x.arc(cx,P.y-6,12,P.f?Math.PI*.6:-Math.PI*.4,P.f?Math.PI*1.4:Math.PI*.4);x.stroke();x.globalAlpha=1}
+ for(const f of fx){if(f.ghost||f.flash)continue;if(f.t){txt(f.t,f.x,f.y,'#fc3')}else{x.fillStyle=f.c;x.fillRect(f.x|0,f.y|0,2,2)}}
+ x.restore();
+ if(L.snow){x.fillStyle='#fff';for(let i=0;i<40;i++)x.fillRect((i*37+Date.now()/30*(1+i%3))%W,(i*53+Date.now()/20)%H,1,1)}
+ for(const f of fx)if(f.flash){x.fillStyle='rgba(255,240,200,'+f.l/20+')';x.fillRect(0,0,W,H)}
+ x.restore();
+ // HUD
+ for(let i=0;i<5;i++){x.fillStyle=i<P.hp?'#c22':'#4448';x.fillRect(4+i*8,4,6,6)}
+ x.fillStyle='#0008';x.fillRect(4,13,42,5);x.fillStyle=kami>=100?((Date.now()/100|0)%2?'#fff':'#fc3'):'#fc3';x.fillRect(5,14,kami*.4,3);
+ txt('KAMI',58,18,'#fc3',1,'left');txt(score+'',W-4,10,'#fff',1,'right');
+ if(!boss)txt(Math.min(kills,L.kills)+'/'+L.kills,W-4,20,'#ccc',1,'right');
+ if(combo>1)txt(combo+' HIT!',W/2,22,'#fc3',1+(combo>9));
+ if(boss){x.fillStyle='#0008';x.fillRect(60,H-10,136,5);x.fillStyle='#c22';x.fillRect(61,H-9,134*boss.hp/boss.mhp,3);txt('ONI KING',W/2,H-12,'#fff')}
+ if(mt>0)txt(msg,W/2,60,'#fff',2);
+ if(st=='over'){x.fillStyle='#000a';x.fillRect(0,0,W,H);txt('FALLEN',W/2,55,'#c22',2);txt('score '+score+'  best '+best,W/2,78,'#fff');txt('tap to rise again',W/2,98,'#fc3')}
+ if(st=='win'){x.fillStyle='#000a';x.fillRect(0,0,W,H);txt('THE ONI IS SLAIN',W/2,55,'#fc3',2);txt('score '+score+'  best '+best,W/2,78,'#fff');txt('tap to play again',W/2,98,'#fff')}
+}
+function txt(t,X,Y,col,sz=1,al='center'){x.font=(8*sz)+'px monospace';x.textAlign=al;x.fillStyle='#000';x.fillText(t,X+1,Y+1);x.fillStyle=col;x.fillText(t,X,Y)}
+let acc=0,prev=performance.now();
+(function loop(now){requestAnimationFrame(loop);acc+=Math.min(100,now-prev);prev=now;
+ while(acc>=16.7){acc-=16.7;if(st=='play'){if(slow>0){slow--;if(slow%2)continue}step();if(shake>0)shake*=.85;if(shake<.3)shake=0}}render()})(prev);
+</script></body></html>

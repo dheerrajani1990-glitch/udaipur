@@ -1,0 +1,25 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><title>Drive</title>
+<style>body{margin:0;overflow:hidden;touch-action:none;font-family:sans-serif}.b{position:fixed;bottom:20px;width:80px;height:80px;border-radius:50%;background:#fff8;font-size:30px;display:flex;align-items:center;justify-content:center;user-select:none}</style></head><body>
+<div class="b" id="L" style="left:20px">◀</div><div class="b" id="R" style="left:110px">▶</div>
+<div class="b" id="G" style="right:20px">▲</div><div class="b" id="K" style="right:110px">▼</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script><script>
+const s=new THREE.Scene();s.background=new THREE.Color(0x9cd);s.fog=new THREE.Fog(0x9cd,50,300);
+const cam=new THREE.PerspectiveCamera(70,1,.1,400),r=new THREE.WebGLRenderer();document.body.prepend(r.domElement);
+function sz(){r.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()}onresize=sz;sz();
+s.add(new THREE.HemisphereLight(0xffffff,0x446644,1.1));
+const M=c=>new THREE.MeshLambertMaterial({color:c});
+const g=new THREE.Mesh(new THREE.PlaneGeometry(2000,2000),M(0x5a5));g.rotation.x=-Math.PI/2;s.add(g);
+const B=new THREE.BoxGeometry(1,1,1);
+for(let i=-10;i<=10;i++){for(const v of[0,1]){const rd=new THREE.Mesh(B,M(0x444));rd.scale.set(v?2000:8,.02,v?8:2000);rd.position.set(v?0:i*60,0,v?i*60:0);s.add(rd)}}
+for(let i=0;i<400;i++){const h=5+Math.random()*25,b=new THREE.Mesh(B,M(new THREE.Color().setHSL(Math.random(),.3,.6)));b.scale.set(15,h,15);
+b.position.set((Math.floor(Math.random()*20)-10)*60+30,h/2,(Math.floor(Math.random()*20)-10)*60+30);s.add(b)}
+const car=new THREE.Group(),body=new THREE.Mesh(B,M(0xd22));body.scale.set(2,1,4);body.position.y=.7;car.add(body);
+const top=new THREE.Mesh(B,M(0x222));top.scale.set(1.8,.7,2);top.position.set(0,1.5,.3);car.add(top);s.add(car);
+const k={};for(const id of'LRGK'){const e=document.getElementById(id);e.ontouchstart=e.onmousedown=ev=>{ev.preventDefault();k[id]=1};e.ontouchend=e.onmouseup=()=>k[id]=0}
+onkeydown=e=>k[{ArrowLeft:'L',ArrowRight:'R',ArrowUp:'G',ArrowDown:'K'}[e.key]]=1;onkeyup=e=>k[{ArrowLeft:'L',ArrowRight:'R',ArrowUp:'G',ArrowDown:'K'}[e.key]]=0;
+let sp=0,a=0;(function f(){requestAnimationFrame(f);
+sp+=(k.G?.02:0)-(k.K?.03:0);sp*=.985;sp=Math.max(-.5,Math.min(1.5,sp));
+a+=((k.L?1:0)-(k.R?1:0))*.03*Math.min(1,Math.abs(sp)*3)*Math.sign(sp||1);
+car.rotation.y=a;car.position.x-=Math.sin(a)*sp;car.position.z-=Math.cos(a)*sp;
+cam.position.set(car.position.x+Math.sin(a)*10,6,car.position.z+Math.cos(a)*10);cam.lookAt(car.position);r.render(s,cam)})();
+</script></body></html>
